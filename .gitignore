@@ -1,13 +1,5 @@
-# Dependencies
-node_modules/
-package-lock.json
-package.json
-
-# OS generated files
 .DS_Store
 Thumbs.db
-ehthumbs.db
-desktop.ini
-
-# Logs & Temp
+node_modules/
 *.log
+
