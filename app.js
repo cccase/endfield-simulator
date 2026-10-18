@@ -1,126 +1,8 @@
-// characters.json の読み込み（fetch）がCORSやローカルファイル(file://)制限でブロックされた場合のフォールバックデータ
-const DEFAULT_DATA = {
-  "defaultParty": [
-    "スー",
-    "リーノ",
-    "オクギ",
-    "タンタン"
-  ],
-  "characters": [
-    {
-      "id": "ザイヒ",
-      "name": "ザイヒ",
-      "icon": "image/xaihi.png",
-      "defaultEfficiency": 144.6,
-      "defaultPotential": 4,
-      "baseRefundSP": 0,
-      "potentials": [
-        {
-          "level": 4,
-          "type": "ult_cost_reduction_percent",
-          "value": 10
-        }
-      ],
-      "skills": [
-        { "id": "skill_zaihi", "type": "skill", "name": "戦技", "spCost": 100 },
-        { "id": "combo_zaihi", "type": "combo", "name": "連携技" },
-        { "id": "ult_zaihi", "type": "ult", "name": "必殺技", "epCost": 80 }
-      ]
-    },
-    {
-      "id": "オクギ",
-      "name": "オクギ",
-      "icon": "image/okugi.png",
-      "defaultEfficiency": 146.4,
-      "defaultPotential": 1,
-      "baseRefundSP": 30,
-      "potentials": [
-        { "level": 1, "type": "refund_sp_boost", "value": 10 },
-        { "level": 4, "type": "ult_cost_reduction_percent", "value": 15 }
-      ],
-      "skills": [
-        { "id": "skill_okugi", "type": "skill", "name": "戦技", "spCost": 100 },
-        { "id": "combo_okugi", "type": "combo", "name": "連携技" },
-        { "id": "ult_okugi", "type": "ult", "name": "必殺技", "epCost": 100 },
-        { "id": "ult2_okugi", "type": "ult2", "name": "必殺技2", "epCost": 0 }
-      ]
-    },
-    {
-      "id": "ギルベルタ",
-      "name": "ギルベルタ",
-      "icon": "image/gilberta.png",
-      "defaultEfficiency": 202.9,
-      "defaultPotential": 0,
-      "baseRefundSP": 0,
-      "potentials": [
-        { "level": 4, "type": "ult_cost_reduction_percent", "value": 10 }
-      ],
-      "skills": [
-        { "id": "skill_gilberta", "type": "skill", "name": "戦技", "spCost": 100 },
-        { "id": "combo_gilberta", "type": "combo", "name": "連携技" },
-        { "id": "ult_gilberta", "type": "ult", "name": "必殺技", "epCost": 90 }
-      ]
-    },
-    {
-      "id": "タンタン",
-      "name": "タンタン",
-      "icon": "image/tangtang.png",
-      "defaultEfficiency": 100,
-      "defaultPotential": 1,
-      "baseRefundSP": 0,
-      "potentials": [
-        { "level": 1, "type": "refund_sp_boost", "value": 5 },
-        { "level": 4, "type": "ult_cost_reduction_percent", "value": 15 }
-      ],
-      "skills": [
-        { "id": "skill_tangtang", "type": "skill", "name": "戦技", "spCost": 100 },
-        { "id": "combo_tangtang", "type": "combo", "name": "連携技" },
-        { "id": "ult_tangtang", "type": "ult", "name": "必殺技", "epCost": 90 },
-        { "id": "ult_cancel_tangtang", "type": "ult_cancel", "name": "必殺キャンセル", "spCost": 0 }
-      ]
-    },
-    {
-      "id": "char_su",
-      "name": "スー",
-      "icon": "image/su.png",
-      "defaultEfficiency": 133.4,
-      "defaultPotential": 0,
-      "baseRefundSP": 0,
-      "potentials": [
-        { "level": 4, "type": "ult_cost_reduction_percent", "value": 10 }
-      ],
-      "skills": [
-        { "id": "skill1_su", "type": "skill", "name": "戦技1", "spCost": 100 },
-        { "id": "skill2_su", "type": "skill2", "name": "戦技2", "spCost": 15 },
-        { "id": "combo_su", "type": "combo", "name": "連携技" },
-        { "id": "ult_su", "type": "ult", "name": "必殺技", "epCost": 80 }
-      ]
-    },
-    {
-      "id": "char_lino",
-      "name": "リーノ",
-      "icon": "image/lino.png",
-      "defaultEfficiency": 142.7,
-      "defaultPotential": 0,
-      "baseRefundSP": 0,
-      "potentials": [
-        { "level": 4, "type": "ult_cost_reduction_percent", "value": 15 }
-      ],
-      "skills": [
-        { "id": "skill_lino", "type": "skill", "name": "戦技", "spCost": 25 },
-        { "id": "combo_lino", "type": "combo", "name": "連携技", "epGain": 20 },
-        { "id": "ult_lino", "type": "ult", "name": "必殺技", "epCost": 160 }
-      ]
-    }
-  ]
-};
-
 let allCharacters = [];
-let defaultPartyNames = [];
 let party = [];
 let timelineCycles = [
   []
-]; // タイムライン上に配置されたスキルオブジェクトの配列（サイクルごと）
+]; // Array of skill objects placed on timeline
 let cycleNames = ['サイクル 1'];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -130,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-export-url').addEventListener('click', exportUrl);
   document.getElementById('btn-export-image').addEventListener('click', exportImage);
   loadFromUrl();
-  // 初回描画を保証する
+  // Ensure initial render
   if (!window.location.hash) {
     renderTimeline();
   }
@@ -162,10 +44,6 @@ function loadFromUrl() {
       const data = JSON.parse(jsonStr);
       if (data.party && data.timelineCycles) {
         party = data.party;
-        // 最新の characters.json の baseRefundSP や skills 情報を反映する
-        if (allCharacters.length > 0) {
-          syncPartyWithAllCharacters();
-        }
         timelineCycles = data.timelineCycles;
         cycleNames = data.cycleNames || Array.from({length: timelineCycles.length}, (_, i) => 'サイクル ' + (i + 1));
         renderParty();
@@ -173,20 +51,9 @@ function loadFromUrl() {
         renderTimeline();
       }
     } catch (err) {
-      console.error("URLからの状態復元に失敗しました", err);
+      console.error("Failed to load state from URL", err);
     }
   }
-}
-
-function syncPartyWithAllCharacters() {
-  party.forEach(p => {
-    const fresh = allCharacters.find(x => x.id === p.id);
-    if (fresh) {
-      p.baseRefundSP = fresh.baseRefundSP;
-      p.potentials = fresh.potentials;
-      p.skills = fresh.skills;
-    }
-  });
 }
 
 function exportImage() {
@@ -197,8 +64,8 @@ function exportImage() {
     backgroundColor: '#121212',
     scale: 2,
     onclone: (clonedDoc) => {
-      // html2canvasではinput要素のテキスト位置がずれることがあるため、
-      // クローンされたドキュメント内でspan要素に置き換えて表示崩れを防ぐ
+      // Input elements sometimes shift text or don't render perfectly in html2canvas.
+      // Replacing them with span elements in the cloned document fixes alignment issues.
       const inputs = clonedDoc.querySelectorAll('input[type="number"], input[type="text"]');
       inputs.forEach(input => {
         const span = clonedDoc.createElement('span');
@@ -206,7 +73,7 @@ function exportImage() {
         span.style.cssText = window.getComputedStyle(input).cssText;
         span.style.display = 'inline-block';
         span.style.boxSizing = 'border-box';
-        // キャンバス出力時の見た目調整
+        // Minor adjustments for visual similarity in canvas
         span.style.padding = '2px 4px';
         span.style.lineHeight = 'normal';
         input.parentNode.replaceChild(span, input);
@@ -230,7 +97,7 @@ function exportImage() {
     link.href = canvas.toDataURL('image/png');
     link.click();
   }).catch(err => {
-    console.error("画像の生成に失敗しました", err);
+    console.error("Image generation failed", err);
     alert("画像の生成に失敗しました。");
   });
 }
@@ -238,37 +105,15 @@ function exportImage() {
 async function fetchCharacters() {
   try {
     const res = await fetch('data/characters.json');
-    if (!res.ok) throw new Error(`HTTPエラー! ステータス: ${res.status}`);
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      allCharacters = data;
-      defaultPartyNames = ['スー', 'リーノ', 'オクギ', 'タンタン'];
-    } else {
-      allCharacters = data.characters || [];
-      defaultPartyNames = data.defaultParty || [];
-    }
-  } catch (e) {
-    console.warn("characters.json の fetch に失敗したため、組み込みデータを使用します:", e);
-    allCharacters = JSON.parse(JSON.stringify(DEFAULT_DATA.characters));
-    defaultPartyNames = JSON.parse(JSON.stringify(DEFAULT_DATA.defaultParty));
-  }
-
-  try {
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    allCharacters = await res.json();
     renderRoster();
-
-    // URLから編成が復元されていない場合は、characters.jsonで指定されたデフォルト編成を追加する
-    if (party.length === 0) {
-      defaultPartyNames.forEach(name => {
-        const c = allCharacters.find(x => x.name === name);
-        if (c) addToParty(c);
-      });
-    } else {
-      // 復元済みパーティーに最新のbaseRefundSPやスキルデータを同期する
-      syncPartyWithAllCharacters();
-      renderTimeline();
+  } catch (e) {
+    console.error("Failed to load characters", e);
+    const container = document.getElementById('roster-list');
+    if (container) {
+      container.innerHTML = '<div style="color: #ff7675; padding: 10px; border: 1px solid #ff7675; border-radius: 4px; grid-column: 1 / -1;">キャラクターデータの読み込みに失敗しました。<br>ローカルでHTMLファイルを直接（file://）開いている場合、ブラウザのセキュリティ制限によりデータの取得(fetch)がブロックされます。<br>VSCodeのLive Serverなどのローカルサーバーを使用するか、GitHub Pagesにデプロイしてご確認ください。</div>';
     }
-  } catch (err) {
-    console.error("キャラクターリストの描画中にエラーが発生しました:", err);
   }
 }
 
@@ -290,12 +135,27 @@ function addToParty(charData) {
     return;
   }
   if (party.find(p => p.id === charData.id)) {
-    return; // 既にパーティーに編成済み
+    return; // Already in party
   }
 
-  // characters.json で指定された初期効率・初期凸数を設定
-  const defaultEfficiency = charData.defaultEfficiency !== undefined ? charData.defaultEfficiency : 100;
-  const defaultPotential = charData.defaultPotential !== undefined ? charData.defaultPotential : 0;
+  let defaultEfficiency = 100;
+  let defaultPotential = 0;
+
+  if (charData.name === 'タンタン') {
+     defaultEfficiency = 107;
+     defaultPotential = 1;
+  }
+  if (charData.name === 'ギルベルタ') {
+     defaultEfficiency = 202.9;
+  }
+  if (charData.name === 'オクギ') {
+     defaultEfficiency = 153.4;
+     defaultPotential = 1;
+  }
+  if (charData.name === 'ザイヒ') {
+     defaultEfficiency = 133.7;
+     defaultPotential = 4;
+  }
 
   party.push({
     ...charData,
@@ -310,15 +170,17 @@ function addToParty(charData) {
 
 function removeFromParty(index) {
   party.splice(index, 1);
+  // Also remove their skills from timeline
+  const removedIds = allCharacters.map(c => c.id); // Not needed actually, just filter timeline
   renderParty();
   renderPalette();
 
-  // パーティーから外れたキャラクターのスキルをタイムラインから除外する
+  // Re-filter timeline (remove skills of characters no longer in party)
   const currentPartyIds = party.map(p => p.id);
   timelineCycles = timelineCycles.map(cycle => {
     return cycle.filter(item => {
       if (item.type === 'separator') return true;
-      if (item.type === 'refund' && !item.charId) return true; // 共通の返還SPブロックは残す
+      if (item.type === 'refund' && !item.charId) return true; // Keep generic refund
       return currentPartyIds.includes(item.charId);
     });
   });
@@ -333,7 +195,7 @@ function renderParty() {
     const el = document.createElement('div');
     el.className = 'party-member';
 
-    // 凸数（潜在能力）の選択肢を生成
+    // Potentials options
     let potOptions = `<option value="0">0凸</option>`;
     if (p.potentials) {
       p.potentials.forEach(pot => {
@@ -357,7 +219,7 @@ function renderParty() {
       <button class="remove-btn" onclick="removeFromParty(${index})">×</button>
     `;
 
-    // 選択中の凸数を反映
+    // Sync select value
     const select = el.querySelector('select');
     select.value = p.potential;
 
@@ -373,127 +235,32 @@ function renderPalette() {
   const container = document.getElementById('skill-palette');
   container.innerHTML = '';
 
-  const tableWrap = document.createElement('div');
-  tableWrap.className = 'palette-table';
-
-  // 列ヘッダー行（種類ごとの配置を明示）
-  const headerRow = document.createElement('div');
-  headerRow.className = 'palette-header-row';
-  headerRow.innerHTML = `
-    <div class="palette-header-cell"></div>
-    <div class="palette-header-cell">戦技1</div>
-    <div class="palette-header-cell">戦技2</div>
-    <div class="palette-header-cell">連携技</div>
-    <div class="palette-header-cell">必殺技</div>
-    <div class="palette-header-cell">必殺追加</div>
-    <div class="palette-header-cell">返還SP</div>
-  `;
-  tableWrap.appendChild(headerRow);
-
   party.forEach(p => {
-    const row = document.createElement('div');
-    row.className = 'palette-row';
+    const group = document.createElement('div');
+    group.className = 'palette-group';
 
-    // 0. アイコン列
-    const iconCell = document.createElement('div');
-    iconCell.className = 'palette-cell palette-cell-char';
-    iconCell.innerHTML = `<img src="${p.icon}" class="char-icon" style="margin:0; width:34px; height:34px;">`;
-    row.appendChild(iconCell);
+    // Icon header
+    group.innerHTML = `<img src="${p.icon}" class="char-icon" style="margin:0; width:30px; height:30px;">`;
 
-    // 1. 戦技1列（通常の戦技、またはスーの戦技1）
-    const skill1Cell = document.createElement('div');
-    skill1Cell.className = 'palette-cell';
-    const s1 = p.skills.find(s => s.id === 'skill1_su' || (s.type === 'skill' && s.id !== 'skill2_su'));
-    if (s1) {
-      const el = createDraggableBlock({
+    // Skills
+    p.skills.forEach(s => {
+      const skillEl = createDraggableBlock({
         type: 'skill',
         charId: p.id,
-        skillId: s1.id,
+        skillId: s.id,
         charName: p.name,
         icon: p.icon,
-        skillData: s1
-      }, s1.name);
-      el.classList.add('bg-skill');
-      skill1Cell.appendChild(el);
-    }
-    row.appendChild(skill1Cell);
+        skillData: s
+      }, s.name);
+      if (s.type === 'skill') skillEl.classList.add('bg-skill');
+      if (s.type === 'combo') skillEl.classList.add('bg-combo');
+      if (s.type === 'ult') skillEl.classList.add('bg-ult');
+      if (s.type === 'ult2') skillEl.classList.add('bg-ult2');
+      if (s.type === 'ult_cancel') skillEl.classList.add('bg-ult-cancel');
+      group.appendChild(skillEl);
+    });
 
-    // 2. 戦技2列（スーの戦技2など。持たないキャラは空セル）
-    const skill2Cell = document.createElement('div');
-    skill2Cell.className = 'palette-cell';
-    const s2 = p.skills.find(s => s.type === 'skill2' || s.id === 'skill2_su');
-    if (s2) {
-      const el = createDraggableBlock({
-        type: 'skill',
-        charId: p.id,
-        skillId: s2.id,
-        charName: p.name,
-        icon: p.icon,
-        skillData: s2
-      }, s2.name);
-      el.classList.add('bg-skill');
-      skill2Cell.appendChild(el);
-    }
-    row.appendChild(skill2Cell);
-
-    // 3. 連携技列（全キャラ共通）
-    const comboCell = document.createElement('div');
-    comboCell.className = 'palette-cell';
-    const combo = p.skills.find(s => s.type === 'combo');
-    if (combo) {
-      const el = createDraggableBlock({
-        type: 'skill',
-        charId: p.id,
-        skillId: combo.id,
-        charName: p.name,
-        icon: p.icon,
-        skillData: combo
-      }, combo.name);
-      el.classList.add('bg-combo');
-      comboCell.appendChild(el);
-    }
-    row.appendChild(comboCell);
-
-    // 4. 必殺技列（全キャラ共通）
-    const ultCell = document.createElement('div');
-    ultCell.className = 'palette-cell';
-    const ult = p.skills.find(s => s.type === 'ult');
-    if (ult) {
-      const el = createDraggableBlock({
-        type: 'skill',
-        charId: p.id,
-        skillId: ult.id,
-        charName: p.name,
-        icon: p.icon,
-        skillData: ult
-      }, ult.name);
-      el.classList.add('bg-ult');
-      ultCell.appendChild(el);
-    }
-    row.appendChild(ultCell);
-
-    // 5. 必殺追加列（必殺技2、必殺キャンセル等。持たないキャラは空セル）
-    const ultExtraCell = document.createElement('div');
-    ultExtraCell.className = 'palette-cell';
-    const ultExtra = p.skills.find(s => s.type === 'ult2' || s.type === 'ult_cancel');
-    if (ultExtra) {
-      const el = createDraggableBlock({
-        type: 'skill',
-        charId: p.id,
-        skillId: ultExtra.id,
-        charName: p.name,
-        icon: p.icon,
-        skillData: ultExtra
-      }, ultExtra.name);
-      if (ultExtra.type === 'ult2') el.classList.add('bg-ult2');
-      if (ultExtra.type === 'ult_cancel') el.classList.add('bg-ult-cancel');
-      ultExtraCell.appendChild(el);
-    }
-    row.appendChild(ultExtraCell);
-
-    // 6. 返還SP列（対象キャラのみ。持たないキャラは空セル）
-    const refundCell = document.createElement('div');
-    refundCell.className = 'palette-cell';
+    // Refund Panel (if applicable) - Moved to far right
     if (p.baseRefundSP > 0 || (p.potentials && p.potentials.some(pot => pot.type === 'refund_sp_boost')) || p.name === 'タンタン' || p.name === 'リーノ') {
       const refundEl = createDraggableBlock({
         type: 'refund',
@@ -502,23 +269,14 @@ function renderPalette() {
         icon: p.icon
       }, `返還SP`);
       refundEl.classList.add('bg-refund');
-      refundCell.appendChild(refundEl);
+      group.appendChild(refundEl);
     }
-    row.appendChild(refundCell);
 
-    tableWrap.appendChild(row);
+    container.appendChild(group);
   });
 
-  container.appendChild(tableWrap);
-
-  // 共通ブロック（待機仕切り・任意返還SP）
-  const commonRow = document.createElement('div');
-  commonRow.className = 'palette-common-row';
-
-  const commonLabel = document.createElement('span');
-  commonLabel.style.cssText = 'color: var(--text-muted); font-size: 13px; font-weight: bold; margin-right: 5px;';
-  commonLabel.textContent = '共通:';
-  commonRow.appendChild(commonLabel);
+  const globalGroup = document.createElement('div');
+  globalGroup.className = 'palette-group';
 
   const refundData = {
     type: 'refund'
@@ -532,7 +290,7 @@ function renderPalette() {
     timelineCycles[timelineCycles.length - 1].push(refundData);
     renderTimeline();
   });
-  commonRow.appendChild(refundBlock);
+  globalGroup.appendChild(refundBlock);
 
   const sepData = {
     type: 'separator'
@@ -546,9 +304,9 @@ function renderPalette() {
     timelineCycles[timelineCycles.length - 1].push(sepData);
     renderTimeline();
   });
-  commonRow.appendChild(separatorBlock);
+  globalGroup.appendChild(separatorBlock);
 
-  container.appendChild(commonRow);
+  container.appendChild(globalGroup);
 }
 
 
@@ -562,9 +320,9 @@ function createDraggableBlock(data, text) {
     e.dataTransfer.setData('application/json', JSON.stringify(data));
   });
 
-  // クリックでもタイムライン末尾に追加可能にする
+  // Also allow click-to-add
   el.addEventListener('click', () => {
-    // パレット上のブロック（インデックス未設定）のみ追加する
+    // Only add if it's from the palette (doesn't have an index yet)
     if (data.index === undefined) {
       timelineCycles[timelineCycles.length - 1].push(JSON.parse(JSON.stringify(data)));
       renderTimeline();
@@ -584,45 +342,6 @@ window.updateTimelineRefund = function(cycleIndex, index, value) {
   updateSimulation();
 };
 
-// タンタン・リーノ共通：直前の返還SP以降に発動した連携技回数から返還SPの初期値を計算する関数
-function calculateComboBasedRefund(charId, cycleIndex, index) {
-  const p = party.find(x => x.id === charId);
-  if (!p) return 0;
-
-  const flat = timelineCycles.flat();
-  let absIndex = 0;
-  for (let i = 0; i < cycleIndex; i++) absIndex += timelineCycles[i].length;
-  absIndex += index;
-
-  let recentCombos = 0;
-  for (let i = absIndex - 1; i >= 0; i--) {
-    const pastItem = flat[i];
-    if ((pastItem.type === 'skill' || pastItem.type === 'combo') && pastItem.charId === charId && pastItem.skillData && pastItem.skillData.type === 'combo') {
-      recentCombos++;
-    } else if (pastItem.type === 'refund' && pastItem.charId === charId) {
-      break; // 直前の同キャラの返還SPブロックでカウントを打ち切る
-    } else if (pastItem.charId === charId && pastItem.skillData && pastItem.skillData.type === 'ult_cancel') {
-      break; // 同キャラの必殺キャンセル以前の連携技はカウントしない（カウントを0に戻す）
-    }
-  }
-
-  // 連携技のカウント上限（リーノは最大1回、タンタンは最大2回）
-  const maxCombos = (charId === 'char_lino') ? 1 : 2;
-  recentCombos = Math.min(maxCombos, recentCombos);
-
-  // 連携技1回あたりの返還SP（リーノは10、タンタンは20＋凸効果）
-  let refundPerCombo = (charId === 'char_lino') ? 10 : 20;
-  if (p.potentials) {
-    p.potentials.forEach(pot => {
-      if (p.potential >= pot.level && pot.type === 'refund_sp_boost') {
-        refundPerCombo += pot.value;
-      }
-    });
-  }
-
-  return (recentCombos * refundPerCombo) + (p.baseRefundSP || 0);
-}
-
 function renderTimeline() {
   const wrapper = document.getElementById('timeline-wrapper');
   wrapper.innerHTML = '';
@@ -631,7 +350,7 @@ function renderTimeline() {
     const cycleWrap = document.createElement('div');
     cycleWrap.className = 'cycle-wrapper';
 
-    // サイクル操作ボタン（複製・削除）
+    // Controls
     const controls = document.createElement('div');
     controls.className = 'cycle-controls';
 
@@ -639,7 +358,7 @@ function renderTimeline() {
     cloneBtn.textContent = '複製';
     cloneBtn.onclick = () => {
       const cloned = JSON.parse(JSON.stringify(timelineCycles[cycleIndex]));
-      // 並び替え用の一時フラグを除去
+      // Strip reorder flags just in case
       cloned.forEach(i => delete i.isReorder);
       timelineCycles.splice(cycleIndex + 1, 0, cloned);
       cycleNames.splice(cycleIndex + 1, 0, cycleNames[cycleIndex] + ' (コピー)');
@@ -667,7 +386,7 @@ function renderTimeline() {
     timeline.className = 'sequence-timeline';
     timeline.setAttribute('data-cycle-index', cycleIndex);
 
-    // タイムラインへのドラッグ＆ドロップ設定
+    // Drop setup for the timeline
     timeline.addEventListener('dragover', e => {
       e.preventDefault();
       const draggingElement = document.querySelector('.dragging');
@@ -687,7 +406,7 @@ function renderTimeline() {
       try {
         const data = JSON.parse(dataStr);
         if (data.isReorder) {
-          // 並び替えはdragendイベントで処理する
+          // Handled by dragend
           return;
         }
 
@@ -727,7 +446,7 @@ function renderTimeline() {
         wrap.addEventListener('dragend', () => {
           wrap.classList.remove('dragging');
 
-          // DOMの並び順から全サイクルの配列を再構築する
+          // Rebuild all cycles from DOM
           const newCycles = [];
           const cycleNodes = document.querySelectorAll('.sequence-timeline');
           cycleNodes.forEach(node => {
@@ -756,9 +475,49 @@ function renderTimeline() {
           const stats = getCharacterStats(item.charId);
           let defaultRefund = stats ? stats.refundSP : 0;
 
-          // タンタン・リーノは直前の連携技発動回数に応じた返還SPを同じロジックで計算する
-          if (item.charId === 'タンタン' || item.charId === 'char_lino') {
-            defaultRefund = calculateComboBasedRefund(item.charId, cycleIndex, index);
+          // Tangtang dynamic refund based on combos BEFORE this refund block
+          if (item.charId === 'タンタン') {
+            const p = party.find(x => x.id === 'タンタン');
+            if (p) {
+               // We need to count combos in the flattened sequence up to this point
+               const flat = timelineCycles.flat();
+               // find absolute index of this item
+               let absIndex = 0;
+               for (let i = 0; i < cycleIndex; i++) absIndex += timelineCycles[i].length;
+               absIndex += index;
+
+               let recentCombos = 0;
+               for (let i = absIndex - 1; i >= 0; i--) {
+                  const pastItem = flat[i];
+                  if (pastItem.type === 'skill' && pastItem.charId === 'タンタン' && pastItem.skillData.type === 'combo') {
+                      recentCombos++;                  } else if (pastItem.type === 'refund' && pastItem.charId === 'タンタン') {
+                      break; // stop at last refund
+                  }
+               }
+               recentCombos = Math.min(2, recentCombos);
+               let refundPerCombo = p.potential >= 1 ? 25 : 20;
+               defaultRefund = (recentCombos * refundPerCombo) + p.baseRefundSP;
+            }
+          } else if (item.charId === 'char_lino') {
+            const p = party.find(x => x.id === 'char_lino');
+            if (p) {
+               const flat = timelineCycles.flat();
+               let absIndex = 0;
+               for (let i = 0; i < cycleIndex; i++) absIndex += timelineCycles[i].length;
+               absIndex += index;
+
+               let recentCombos = 0;
+               for (let i = absIndex - 1; i >= 0; i--) {
+                  const pastItem = flat[i];
+                  if ((pastItem.type === 'skill' || pastItem.type === 'combo') && pastItem.charId === 'char_lino' && pastItem.skillData && pastItem.skillData.type === 'combo') {
+                      recentCombos++;
+                  } else if (pastItem.type === 'refund' && pastItem.charId === 'char_lino') {
+                      break;
+                  }
+               }
+               let refundPerCombo = 20;
+               defaultRefund = (recentCombos * refundPerCombo) + p.baseRefundSP;
+            }
           }
 
           const currentVal = item.customRefund !== undefined ? item.customRefund : defaultRefund;
@@ -770,7 +529,7 @@ function renderTimeline() {
           block.classList.add('bg-separator');
 
         } else {
-          if (item.skillData.type === 'skill' || item.skillData.type === 'skill2') block.classList.add('bg-skill');
+          if (item.skillData.type === 'skill') block.classList.add('bg-skill');
           if (item.skillData.type === 'combo') block.classList.add('bg-combo');
           if (item.skillData.type === 'ult') block.classList.add('bg-ult');
           if (item.skillData.type === 'ult2') block.classList.add('bg-ult2');
@@ -802,7 +561,7 @@ function renderTimeline() {
     statsDiv.className = 'cycle-stats';
     statsDiv.id = `cycle-stats-${cycleIndex}`;
 
-    // サイクル統計ヘッダー（編集可能なサイクル名を含む）
+    // Header for cycle stats includes editable name
     statsDiv.innerHTML = `
       <div style="display:flex; align-items:center; gap:10px; margin-right:auto;">
          <input type="text" class="cycle-name-input" value="${(cycleNames[cycleIndex] || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" onchange="updateCycleName(${cycleIndex}, this.value)" placeholder="サイクル名" style="background:#2c2c2c; color:#fff; border:1px solid #444; border-radius:4px; padding:4px 8px; font-weight:bold; width:150px;">
@@ -848,15 +607,15 @@ function clearTimeline() {
   renderTimeline();
 }
 
-// --- シミュレーション計算ロジック ---
+// --- Simulation Logic ---
 
 function getCharacterStats(charId) {
   const p = party.find(x => x.id === charId);
   if (!p) return null;
 
-  // 凸効果（潜在能力）の集計
+  // Calculate final potentials
   let refundSpBoost = 0;
-  let ultCostReduction = 0; // 必殺技コスト軽減率（%）
+  let ultCostReduction = 0; // percentage
 
   if (p.potentials) {
     p.potentials.forEach(pot => {
@@ -868,7 +627,7 @@ function getCharacterStats(charId) {
   }
 
   return {
-    efficiency: p.efficiency / 100, // 倍率（1.0 = 100%）
+    efficiency: p.efficiency / 100, // as multiplier (1.0 = 100%)
     refundSP: p.baseRefundSP + refundSpBoost,
     ultCostReduction: ultCostReduction
   };
@@ -876,18 +635,17 @@ function getCharacterStats(charId) {
 
 function updateSimulation() {
   let totalSpSpent = 0;
-  let totalSpRefunded = 0;
   let currentRefundSpPool = 0;
+  let tangtangComboCount = 0;
   let totalSkillCasts = 0;
   let suSkill1CastCount = 0;
-  // キャラクターごとの連携技カウント（返還SP計算用：タンタン・リーノ共通ロジック）
-  const comboCountsForRefund = {};
+  let linoComboCount = 0;
 
-  // 「開始時チャージマックス」チェックボックスの状態を取得
+  // Check if start max charge is checked
   const startMaxChargeCheckbox = document.getElementById('start-max-charge');
   const startMaxCharge = startMaxChargeCheckbox ? startMaxChargeCheckbox.checked : false;
 
-  // パーティー全員のEP状態を初期化
+  // Initialize EP state for party
   const epState = {};
   party.forEach(p => {
     const stats = getCharacterStats(p.id);
@@ -896,8 +654,6 @@ function updateSimulation() {
     if (ultSkill && stats.ultCostReduction > 0) {
       maxEp = maxEp * (1 - stats.ultCostReduction / 100);
     }
-
-    comboCountsForRefund[p.id] = 0;
 
     epState[p.id] = {
       current: startMaxCharge ? maxEp : 0,
@@ -912,7 +668,7 @@ function updateSimulation() {
     };
   });
 
-  // サイクルごとにタイムラインを順番に処理する
+  // Process sequence cycle by cycle
   timelineCycles.forEach((cycle, cycleIndex) => {
     let cycleSpSpent = 0;
     let cycleRefundSp = 0;
@@ -924,63 +680,57 @@ function updateSimulation() {
 
       if (step.type === 'refund') {
         let baseVal = stats ? stats.refundSP : 0;
-        // タンタンとリーノは連携技回数から返還SPを算出する
         if (step.charId === 'タンタン' || step.charId === 'char_lino') {
           const p = party.find(x => x.id === step.charId);
           if (p) {
-            const maxCombos = (step.charId === 'char_lino') ? 1 : 2;
-            const recentCombos = Math.min(maxCombos, comboCountsForRefund[step.charId] || 0);
-            let refundPerCombo = (step.charId === 'char_lino') ? 10 : 20;
-            if (p.potentials) {
-              p.potentials.forEach(pot => {
-                if (p.potential >= pot.level && pot.type === 'refund_sp_boost') {
-                  refundPerCombo += pot.value;
-                }
-              });
+            if (p.name === 'タンタン') {
+              let recentCombos = Math.min(2, tangtangComboCount);
+              let refundPerCombo = p.potential >= 1 ? 25 : 20;
+              baseVal = (recentCombos * refundPerCombo) + p.baseRefundSP;
+              tangtangComboCount = 0;
+            } else if (p.name === 'リーノ') {
+              let recentCombos = linoComboCount;
+              let refundPerCombo = 20;
+              baseVal = (recentCombos * refundPerCombo) + p.baseRefundSP;
+              linoComboCount = 0;
+            } else {
+               baseVal = p.baseRefundSP;
             }
-            baseVal = (recentCombos * refundPerCombo) + (p.baseRefundSP || 0);
-            comboCountsForRefund[step.charId] = 0;
           }
         }
         const refundVal = step.customRefund !== undefined ? step.customRefund : baseVal;
-        totalSpRefunded += refundVal;
         currentRefundSpPool += refundVal;
         cycleRefundSp += refundVal;
       } else if (step.type === 'skill' || step.type === 'skill2' || step.type === 'skill_2') {
         const s = step.skillData || {};
 
-        // スーの戦技1・戦技2の発動順序チェック
         if (s.name === '戦技1' && step.charId === 'char_su') {
-          suSkill1CastCount++;
+            suSkill1CastCount++;
         }
         if (s.name === '戦技2' && step.charId === 'char_su') {
-          if (suSkill1CastCount <= 0) {
-            epState[step.charId].warnings.push('戦技2は戦技1の後に発動可能');
-          } else {
-            suSkill1CastCount--;
-          }
+            if (suSkill1CastCount <= 0) {
+                 epState[step.charId].warnings.push('戦技2は戦技1の後に発動可能');
+            } else {
+                 suSkill1CastCount--;
+            }
         }
 
         if (s.type === 'skill' || s.type === 'skill2' || s.type === 'skill_2') {
-          const spCost = s.spCost || 0;
-          totalSpSpent += spCost;
-          cycleSpSpent += spCost;
+          // Removed Tangtang auto-refund. Now requires explicit refund block.
+          // tangtangComboCount does NOT reset here.
 
-          // 返還SPプールから優先的に消費する
+          totalSpSpent += s.spCost;
+          cycleSpSpent += s.spCost;
+          let epBase = 6.5;
           let consumedRefund = 0;
-          if (currentRefundSpPool > 0 && spCost > 0) {
-            consumedRefund = Math.min(currentRefundSpPool, spCost);
+          let skillCastValue = 1;
+
+          if (currentRefundSpPool > 0) {
+            consumedRefund = Math.min(currentRefundSpPool, s.spCost);
             currentRefundSpPool -= consumedRefund;
+            epBase = ((s.spCost - consumedRefund) / s.spCost) * 6.5;
+            skillCastValue = ((s.spCost - consumedRefund) / s.spCost);
           }
-
-          // 実質消費した通常SP（返還SPを除いた消費SP）
-          const actualNormalSpSpent = spCost - consumedRefund;
-
-          // 必殺チャージ（EP回復）仕様：
-          // 通常のSP100消費につき基礎6.5回復（返還SP消費分はEPを回復しない）
-          // 例：100SP消費 -> 6.5回復、25SP消費 -> 6.5 * (1/4)回復、通常SP75+返還SP25消費 -> 6.5 * (3/4)回復
-          const epBase = (actualNormalSpSpent / 100) * 6.5;
-          const skillCastValue = actualNormalSpSpent / 100;
           totalSkillCasts += skillCastValue;
 
           party.forEach(p => {
@@ -996,18 +746,18 @@ function updateSimulation() {
           });
 
         } else if (s.type === 'combo' || (step.skillData && step.skillData.type === 'combo')) {
-          if (step.charId === 'タンタン' || step.charId === 'char_lino') {
-            comboCountsForRefund[step.charId] = (comboCountsForRefund[step.charId] || 0) + 1;
+          if (step.charId === 'タンタン') {
+            tangtangComboCount++;
+          } else if (step.charId === 'char_lino' || step.charName === 'リーノ') {
+            linoComboCount++;
           }
-          // 連携技による必殺チャージ回復（リーノは20、通常キャラは10）
-          const baseGain = (s.epGain !== undefined) ? s.epGain : ((step.charId === 'char_lino') ? 20 : 10);
-          const gain = baseGain * stats.efficiency;
+          const gain = 10 * stats.efficiency;
           epState[step.charId].comboCount += 1;
           if (!epState[step.charId].epLock) {
             epState[step.charId].current += gain;
             if (!epState[step.charId].hasCastUlt) {
-              epState[step.charId].epGainedBeforeFirstUlt += gain;
-              epState[step.charId].baseEpGainedBeforeFirstUlt += baseGain;
+                epState[step.charId].epGainedBeforeFirstUlt += gain;
+                epState[step.charId].baseEpGainedBeforeFirstUlt += 10;
             }
           }
         } else if (step.type === 'ult' || (step.skillData && step.skillData.type === 'ult')) {
@@ -1024,43 +774,33 @@ function updateSimulation() {
           epState[step.charId].ultCount += 1;
           epState[step.charId].hasCastUlt = true;
 
-          // オクギは必殺技1発動後に必殺技2を発動するまでEP獲得がロックされる
           if (step.charId === 'オクギ') {
             epState[step.charId].epLock = true;
           }
         } else if (step.type === 'ult2' || (step.skillData && step.skillData.type === 'ult2')) {
-          // オクギの必殺技2発動でEPロックを解除する
           if (step.charId === 'オクギ') {
             epState[step.charId].epLock = false;
           }
         } else if (step.type === 'ult_cancel' || (step.skillData && step.skillData.type === 'ult_cancel')) {
-          // 必殺キャンセル発動時、そのキャラの返還SP用連携技カウントを0に戻す
-          comboCountsForRefund[step.charId] = 0;
+          // just a timeline marker
         }
       }
     });
 
-    // サイクルごとの消費SP・返還SP表示を更新
+    // Update cycle stats UI
     const cycleStatsDiv = document.getElementById(`cycle-stats-${cycleIndex}`);
     if (cycleStatsDiv) {
-      cycleStatsDiv.querySelector('.sp-spent').textContent = cycleSpSpent;
-      cycleStatsDiv.querySelector('.sp-refund').textContent = cycleRefundSp;
+        cycleStatsDiv.querySelector('.sp-spent').textContent = cycleSpSpent;
+        cycleStatsDiv.querySelector('.sp-refund').textContent = cycleRefundSp;
     }
   });
 
-  renderStatus(totalSpSpent, totalSpRefunded, currentRefundSpPool, epState, totalSkillCasts);
+  renderStatus(totalSpSpent, currentRefundSpPool, epState, totalSkillCasts);
 }
 
-function renderStatus(totalSpSpent, totalSpRefunded, currentRefundSpPool, epState, totalSkillCasts) {
-  const totalSpSpentEl = document.getElementById('total-sp-spent');
-  if (totalSpSpentEl) totalSpSpentEl.textContent = totalSpSpent;
-
-  const totalSpRefundedEl = document.getElementById('total-sp-refunded');
-  if (totalSpRefundedEl) totalSpRefundedEl.textContent = totalSpRefunded;
-
-  const currentRefundSpEl = document.getElementById('current-refund-sp');
-  if (currentRefundSpEl) currentRefundSpEl.textContent = currentRefundSpPool;
-
+function renderStatus(totalSpSpent, currentRefundSpPool, epState, totalSkillCasts) {
+  document.getElementById('total-sp-spent').textContent = totalSpSpent;
+  document.getElementById('current-refund-sp').textContent = currentRefundSpPool;
   const totalSkillCastsEl = document.getElementById('total-skill-casts');
   if (totalSkillCastsEl) totalSkillCastsEl.textContent = totalSkillCasts.toFixed(2);
 
@@ -1071,7 +811,7 @@ function renderStatus(totalSpSpent, totalSpRefunded, currentRefundSpPool, epStat
     const stats = getCharacterStats(p.id);
     const state = epState[p.id];
 
-    // ゲージ最大値表示用の必殺技コストを計算
+    // Find ult cost for max bar visualization
     const ultSkill = p.skills.find(s => s.type === 'ult');
     let maxEp = ultSkill ? ultSkill.epCost : 100;
     if (ultSkill && stats.ultCostReduction > 0) {
