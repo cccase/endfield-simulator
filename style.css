@@ -61,14 +61,75 @@ h1, h2 { color: var(--accent); margin-top: 0; }
   border-color: var(--accent);
 }
 
-/* キャラクターグリッド & カード */
+/* キャラクターリスト：グループ表示（高さ制限とスクロール） */
 .roster-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
-  gap: 10px;
-  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 520px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #555 #1a1a1a;
+}
+.roster-container::-webkit-scrollbar {
+  width: 6px;
+}
+.roster-container::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+.roster-container::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+.roster-container::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+.roster-group {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.roster-group-header {
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: bold;
+  background-color: #262626;
+  border-bottom: 1px solid #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.roster-group-header .group-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+.roster-group-header.group-rarity-6 { color: #ffa940; border-left: 4px solid #fa8c16; }
+.roster-group-header.group-rarity-5 { color: #ffd666; border-left: 4px solid #d4b106; }
+.roster-group-header.group-rarity-4 { color: #b37feb; border-left: 4px solid #722ed1; }
+
+.roster-group-header.group-elem-物理 { color: #e0e0e0; border-left: 4px solid #888; }
+.roster-group-header.group-elem-灼熱 { color: #ff9c6e; border-left: 4px solid #d4380d; }
+.roster-group-header.group-elem-電磁 { color: #85a5ff; border-left: 4px solid #1d39c4; }
+.roster-group-header.group-elem-寒冷 { color: #5cdbd3; border-left: 4px solid #08979c; }
+.roster-group-header.group-elem-自然 { color: #95de64; border-left: 4px solid #389e0d; }
+
+.roster-group-header.group-class-前衛 { color: #ff7875; border-left: 4px solid #f5222d; }
+.roster-group-header.group-class-先鋒 { color: #ffa940; border-left: 4px solid #fa8c16; }
+.roster-group-header.group-class-重装 { color: #ffc069; border-left: 4px solid #faad14; }
+.roster-group-header.group-class-術師 { color: #b37feb; border-left: 4px solid #722ed1; }
+.roster-group-header.group-class-突撃 { color: #ff85c0; border-left: 4px solid #eb2f96; }
+.roster-group-header.group-class-補助 { color: #5cdbd3; border-left: 4px solid #13c2c2; }
+
+.roster-group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 8px;
+  padding: 8px;
 }
 .roster-char {
   position: relative;
@@ -172,24 +233,205 @@ h1, h2 { color: var(--accent); margin-top: 0; }
 .settings-group { display: flex; align-items: center; gap: 5px; font-size: 14px; }
 .settings-group input, .settings-group select { background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; }
 .remove-btn { margin-left: auto; background: none; border: none; color: #ff4c4c; font-size: 20px; cursor: pointer; font-weight: bold; padding: 0 4px; }
+/* 装備・武器設定コンテナ（flex配置） */
+.equip-weapon-container {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.equip-weapon-container > details {
+  flex: 1;
+  min-width: 0;
+}
+
 .equip-details { width: 100%; background-color: #1e1e1e; border: 1px solid #383838; border-radius: 5px; overflow: hidden; box-sizing: border-box; }
 .equip-summary { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; cursor: pointer; font-size: 12px; color: #ccc; user-select: none; background-color: #252525; }
 .equip-summary:hover { background-color: #2e2e2e; color: #fff; }
 .equip-bonus-badge { color: #00b894; font-weight: bold; font-size: 12px; }
-.equip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; padding: 10px; background-color: #1a1a1a; }
+
+/* 武器設定パネル */
+.weapon-body {
+  padding: 8px 10px;
+  background-color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.weapon-select-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.weapon-select-row label {
+  font-size: 11px;
+  color: #aaa;
+}
+.weapon-select-row select {
+  background-color: #2a2a2a;
+  color: #f0f0f0;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.weapon-select-row select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.weapon-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+.weapon-skill-row {
+  background-color: #222;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.weapon-skill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.weapon-skill-name {
+  font-size: 11px;
+  font-weight: bold;
+  color: #ddd;
+}
+.weapon-skill-level-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #aaa;
+}
+.weapon-skill-level-wrap select {
+  background-color: #2a2a2a;
+  color: #f0f0f0;
+  border: 1px solid #444;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-size: 11px;
+}
+.weapon-skill-desc {
+  font-size: 10px;
+  color: #999;
+  line-height: 1.35;
+  word-break: break-all;
+}
+.weapon-skill-desc .highlight-eff {
+  color: #00cec9;
+  font-weight: bold;
+}
+
+/* 防具設定グリッド */
+.equip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; padding: 10px; background-color: #1a1a1a; }
 .equip-field { display: flex; flex-direction: column; gap: 3px; }
 .equip-field label { font-size: 11px; color: #aaa; }
 .equip-field select { background-color: #2a2a2a; color: #f0f0f0; border: 1px solid #444; border-radius: 4px; padding: 4px 6px; font-size: 12px; width: 100%; box-sizing: border-box; }
 .equip-field select:focus { outline: none; border-color: var(--accent); }
+
+@media (max-width: 768px) {
+  .equip-weapon-container {
+    flex-direction: column;
+  }
+}
 @media (max-width: 600px) {
   .party-member-header { flex-wrap: wrap; gap: 6px; }
   .equip-grid { grid-template-columns: 1fr; }
 }
+
+/* スキルパレット ヘッダー & スキル名表示切り替えトグル */
+.palette-header-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.palette-header-wrap h2 {
+  margin: 0;
+}
+.skill-name-toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.skill-name-toggle-switch .toggle-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.toggle-btn-group {
+  display: inline-flex;
+  background-color: #161616;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+.toggle-mode-btn {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.toggle-mode-btn:hover {
+  color: #fff;
+}
+.toggle-mode-btn.active {
+  background-color: var(--accent);
+  color: #111;
+  font-weight: bold;
+}
+
 .palette-container { display: flex; flex-direction: column; gap: 12px; overflow-x: auto; }
-.palette-table { display: flex; flex-direction: column; gap: 8px; min-width: max-content; }
-.palette-header-row { display: grid; grid-template-columns: 40px 105px 105px 105px 105px 105px 135px 110px; gap: 12px; align-items: center; color: var(--text-muted); font-size: 12px; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 4px; }
+.palette-table {
+  display: grid;
+  grid-template-columns: 40px repeat(5, minmax(105px, max-content)) minmax(135px, max-content) minmax(110px, max-content) minmax(110px, max-content);
+  column-gap: 12px;
+  row-gap: 8px;
+  min-width: max-content;
+}
+.palette-header-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 40px repeat(5, minmax(105px, max-content)) minmax(135px, max-content) 110px 110px;
+  grid-template-columns: subgrid;
+  gap: 12px;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: bold;
+  border-bottom: 1px solid #444;
+  padding-bottom: 4px;
+}
 .palette-header-cell { text-align: center; }
-.palette-row { display: grid; grid-template-columns: 40px 105px 105px 105px 105px 105px 135px 110px; gap: 12px; align-items: center; padding-bottom: 6px; border-bottom: 1px dashed var(--border-color); }
+.palette-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 40px repeat(5, minmax(105px, max-content)) minmax(135px, max-content) 110px 110px;
+  grid-template-columns: subgrid;
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-color);
+}
 .palette-cell { display: flex; align-items: center; justify-content: flex-start; min-height: 34px; }
 .palette-cell-char { justify-content: center; }
 .palette-common-row { display: flex; align-items: center; gap: 10px; padding-top: 8px; }

@@ -1,11 +1,4 @@
 {
-  "weapons": [
-    { "id": "none", "name": "なし (0%)", "efficiency": 0 },
-    { "id": "weapon_std", "name": "標準武器 (0%)", "efficiency": 0 },
-    { "id": "weapon_charge_1", "name": "チャージ型武器 (+15%)", "efficiency": 15.0 },
-    { "id": "weapon_charge_2", "name": "チャージ型武器・精錬 (+20%)", "efficiency": 20.0 },
-    { "id": "weapon_charge_3", "name": "モチーフ特化武器 (+30%)", "efficiency": 30.0 }
-  ],
   "armorSets": [
     { "id": "none", "name": "なし (0%)", "efficiency": 0 },
     { "id": "syusei", "name": "集成訓練 [3セット] (+10%)", "efficiency": 10.0 },
